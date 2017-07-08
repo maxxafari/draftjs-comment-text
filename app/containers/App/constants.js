@@ -10,3 +10,5 @@
  */
 
 export const DEFAULT_LOCALE = 'en';
+export const DEFAULT_EXAMPLE_TEXT = ```A text that can be commented or edited
+can conatain linbreaks perhaps...? ```;
