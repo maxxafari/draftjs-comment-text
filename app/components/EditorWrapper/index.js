@@ -4,12 +4,15 @@ import { createSelector } from 'reselect';
 import { Editor, RichUtils } from 'draft-js';
 require('draft-js/dist/Draft.css');
 
+import CommentPopUp from './CommentPopUp';
+
 const style = { background: 'white', border: '1px solid black', minHeight: '200px' };
 
 class EditorWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
+    this.handleMenuClick = this.handleMenuClick.bind(this);
   }
 
   handleKeyCommand(command) {
@@ -25,12 +28,29 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
     return 'not-handled';
   }
 
+  handleMenuClick(command) {
+    const { editorState, setEditorState } = this.props;
+    switch (command) {
+      case 'BOLD':
+        return setEditorState(
+          RichUtils.toggleInlineStyle(editorState, 'BOLD')
+        );
+      case 'COMMENT':
+        console.log("add comment");
+    }
+
+  }
+
   render() {
     const { editorState, setEditorState } = this.props;
     return (
       <div style={style}>
         <p>Add notes by selecting text</p>
+        <div className="editor__menu">
+           <button onClick={(e) => {this.handleMenuClick('BOLD')}}>Bold</button>
+        </div>
         <Editor handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
+        <CommentPopUp commentString="hello" />
       </div>
     );
   }
