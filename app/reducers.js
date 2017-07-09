@@ -45,7 +45,7 @@ export default function createReducer(asyncReducers) {
   return combineReducers({
     route: routeReducer,
     language: languageProviderReducer,
-    editor: editorReducer
+    editor: editorReducer,
     ...asyncReducers,
   });
 }
