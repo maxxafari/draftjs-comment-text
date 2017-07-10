@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { Editor, RichUtils } from 'draft-js';
+import { Editor, RichUtils, convertToRaw } from 'draft-js';
 require('draft-js/dist/Draft.css');
 
 import CommentPopUp from './CommentPopUp';
@@ -49,7 +49,7 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
         <div className="editor__menu">
            <button onClick={(e) => {this.handleMenuClick('BOLD')}}>Bold</button>
         </div>
-        <Editor handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
+        <Editor ref="edit" handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
         <CommentPopUp commentString="hello" />
       </div>
     );
