@@ -6,33 +6,31 @@ import {
   EXAMPLE_EDITOR_BLOCKS,
 } from '../App/constants'; // eslint-disable-line
 
-function strategyByType(type){
-  return function(contentBlock, callback, contentState) {
-    contentBlock.findEntityRanges(
+function strategyByType(type) {
+  return function strate(contentBlock, callback, contentState) {
+    return contentBlock.findEntityRanges(
       (character) => {
         const entityKey = character.getEntity();
-        if ( entityKey === null ) {
-          return false;
-        } else if ( contentState.getEntity(entityKey).getType() === type ) {
-          console.log("entityIs", type);
+        if (entityKey !== null && contentState.getEntity(entityKey).getType() === type) {
           return true;
         }
+        return false;
       },
       callback
     );
-  }
+  };
 }
 
 const decorator = new CompositeDecorator([
   {
     strategy: strategyByType('COMMENT'),
     component: CommentSpan,
-  }
+  },
 ]);
 
- function CommentSpan(props){
-    return <span className="editor__comment" style={{color: "green"}}>{props.children}</span>;
-};
+function CommentSpan(props) {
+  return <span className="editor__comment" style={{ backgroundColor: 'yellow' }}>{props.children}</span>;
+}
 
 const initialState = fromJS({
   editorState: EditorState.createWithContent(convertFromRaw(EXAMPLE_EDITOR_BLOCKS), decorator),

@@ -19,7 +19,7 @@ export const EXAMPLE_EDITOR_BLOCKS = {
         'will remove the entity from the range.'
       ),
       type: 'unstyled',
-      entityRanges: [{offset: 31, length: 8, key: 'first'}],
+      entityRanges: [{ offset: 31, length: 8, key: 'first' }],
     },
     {
       text: '',
@@ -31,7 +31,7 @@ export const EXAMPLE_EDITOR_BLOCKS = {
         'and removed.'
       ),
       type: 'unstyled',
-      entityRanges: [{offset: 28, length: 6, key: 'second'}],
+      entityRanges: [{ offset: 28, length: 6, key: 'second' }],
     },
     {
       text: '',
@@ -44,22 +44,25 @@ export const EXAMPLE_EDITOR_BLOCKS = {
         'Adding characters will remove the entire entity from the range.'
       ),
       type: 'unstyled',
-      entityRanges: [{offset: 30, length: 13, key: 'third'}],
+      entityRanges: [{ offset: 30, length: 13, key: 'third' }],
     },
   ],
 
   entityMap: {
     first: {
       type: 'COMMENT',
-      mutability: 'IMMUTABLE',
+      mutability: 'MUTABLE',
+      data: {'comment': 'hej1'},
     },
     second: {
       type: 'COMMENT',
       mutability: 'MUTABLE',
+      data: {'comment': 'hej 2'},
     },
     third: {
       type: 'COMMENT',
-      mutability: 'SEGMENTED',
+      mutability: 'MUTABLE',
+      data: {'comment': 'hej 3'},
     },
   },
 };
