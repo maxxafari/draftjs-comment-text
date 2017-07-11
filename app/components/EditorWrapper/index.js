@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Editor, RichUtils, convertToRaw } from 'draft-js';
+import { Editor, RichUtils } from 'draft-js';
 import CommentPopUp from './CommentPopUp';
+import CommentsList from '../CommentsList';
 require('draft-js/dist/Draft.css');
 
 const style = { background: 'white', border: '1px solid black', minHeight: '200px' };
@@ -36,7 +37,7 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
     e.preventDefault();
     const { editorState, editComment, setEditorState, commentIsBeingEdited } = this.props;
     if (commentIsBeingEdited) {
-      console.warn("dont edit text while commenting...");
+      console.warn('dont edit text while commenting...');
       return false;
     }
     switch (command) {
@@ -81,7 +82,7 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
     const { editorState, setEditorState, commentIsBeingEdited } = this.props;
     const selection = editorState.getSelection();
     const textIsSelected = !selection.isCollapsed();
-    console.log(commentIsBeingEdited, "commentIsBeingEdited");
+    console.log(commentIsBeingEdited, 'commentIsBeingEdited');
     return (
       <div style={style}>
         <p>Add notes by selecting text</p>
@@ -99,17 +100,18 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
         {commentIsBeingEdited &&
           <CommentPopUp />
         }
+        <CommentsList />
       </div>
     );
   }
 }
 
-function mapStateToProps(state){
+function mapStateToProps(state) {
   return {
-    editorState: state.getIn(['editor','editorState']),
-    commentIsBeingEdited: state.getIn(['editor','commentIsBeingEdited']),
-  }
-};
+    editorState: state.getIn(['editor', 'editorState']),
+    commentIsBeingEdited: state.getIn(['editor', 'commentIsBeingEdited']),
+  };
+}
 
 
 function mapDispatchToProps(dispatch) {
@@ -123,9 +125,9 @@ function mapDispatchToProps(dispatch) {
     editComment: (commentText) => {
       dispatch({
         type: 'EDIT_COMMENT',
-        commentText: commentText
-      })
-    }
+        commentText,
+      });
+    },
   };
 }
 
