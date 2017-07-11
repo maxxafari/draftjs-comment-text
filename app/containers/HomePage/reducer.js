@@ -34,13 +34,25 @@ function CommentSpan(props) {
 
 const initialState = fromJS({
   editorState: EditorState.createWithContent(convertFromRaw(EXAMPLE_EDITOR_BLOCKS), decorator),
+  commentText: null,
+  commentIsBeingEdited: false,
 });
 
 export default function editorReducer(state = initialState, action) {
   switch (action.type) {
     case 'SET_EDITOR_STATE':
       return state
-        .set('editorState', action.editorState);
+        .set('editorState', action.editorState)
+        .set('commentIsBeingEdited', false);
+    case 'SAVE_COMMENT':
+      return state
+        .set('editorState', action.editorState)
+        .set('commentText', null)
+        .set('commentIsBeingEdited', false);
+    case 'EDIT_COMMENT':
+      return state
+      .set('commentText', action.commentText)
+      .set('commentIsBeingEdited', true);
     default:
       return state;
   }

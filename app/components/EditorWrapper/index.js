@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 import { Editor, RichUtils, convertToRaw } from 'draft-js';
 import CommentPopUp from './CommentPopUp';
 require('draft-js/dist/Draft.css');
@@ -35,7 +34,11 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
 
   handleMenuClick(e, command) {
     e.preventDefault();
-    const { editorState, setEditorState } = this.props;
+    const { editorState, editComment, setEditorState, commentIsBeingEdited } = this.props;
+    if (commentIsBeingEdited) {
+      console.warn("dont edit text while commenting...");
+      return false;
+    }
     switch (command) {
       case 'BOLD': {
         return setEditorState(
@@ -43,7 +46,7 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
         );
       }
       case 'COMMENT': {
-        console.log('add comment');
+        console.log('edit comment');
         const selection = editorState.getSelection();
         if (!selection.isCollapsed()) {
           const contentState = editorState.getCurrentContent();
@@ -57,10 +60,7 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
             const linkInstance = contentState.getEntity(linkKey);
             commentText = linkInstance.getData().comment;
           }
-          this.setState({
-            commentText,
-            showCommentPopUp: true,
-          });
+          editComment(commentText);
         } else {
           console.log('collapsed');
         }
@@ -70,7 +70,7 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
         break;
       }
     }
-    return e;
+    return true;
   }
 
   render() {
@@ -78,10 +78,10 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
       normal: { border: '2px solid black', padding: '10px' },
       disabled: { border: '2px solid black', padding: '10px', backgroundColor: 'grey' },
     };
-    const { editorState, setEditorState } = this.props;
-    const { showCommentPopUp, commentText } = this.state;
+    const { editorState, setEditorState, commentIsBeingEdited } = this.props;
     const selection = editorState.getSelection();
     const textIsSelected = !selection.isCollapsed();
+    console.log(commentIsBeingEdited, "commentIsBeingEdited");
     return (
       <div style={style}>
         <p>Add notes by selecting text</p>
@@ -96,33 +96,36 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
           </button>
         </div>
         <Editor handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
-        {showCommentPopUp &&
-          <CommentPopUp commentString={commentText} selection={selection} />
+        {commentIsBeingEdited &&
+          <CommentPopUp />
         }
       </div>
     );
   }
 }
 
-const editorStateSelect = createSelector(
-  (state) => state.get('editor'),
-  (editor) => editor.get('editorState')
-);
-
-const mapStateToProps = (state) => ({
-  editorState: editorStateSelect(state),
-});
+function mapStateToProps(state){
+  return {
+    editorState: state.getIn(['editor','editorState']),
+    commentIsBeingEdited: state.getIn(['editor','commentIsBeingEdited']),
+  }
+};
 
 
 function mapDispatchToProps(dispatch) {
   return {
     setEditorState: (newState) => {
-      console.log('set state in index', convertToRaw(newState.getCurrentContent()));
       dispatch({
         type: 'SET_EDITOR_STATE',
         editorState: newState,
       });
     },
+    editComment: (commentText) => {
+      dispatch({
+        type: 'EDIT_COMMENT',
+        commentText: commentText
+      })
+    }
   };
 }
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 import { EditorState, convertToRaw, Modifier } from 'draft-js';
 
 function CommentSpan(props) {
@@ -36,8 +35,9 @@ class CommentPopUp extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   save() {
-    const { editorState, setEditorState, selection } = this.props;
+    const { editorState, saveComment, editComment } = this.props;
     const contentState = editorState.getCurrentContent();
+    const selection = editorState.getSelection();
     const contentStateWithEntity = contentState.createEntity(
       'COMMENT',
       'MUTABLE',
@@ -57,16 +57,19 @@ class CommentPopUp extends React.PureComponent { // eslint-disable-line react/pr
       contentStateWithComment,
       'apply-entity')
     console.log('editor state:', newEditorState);
-    setEditorState(newEditorState);
-
+    saveComment(newEditorState);
   }
 
   render() {
-    const { commentString } = this.props;
+    const { commentText } = this.props;
     return (
       <div style={style}>
         <p>Add comment to text</p>
-        <input onKeyDown={this.onLinkInputKeyDown} style={inputStyle} type="text" ref={(c) => { this.newCommentText = c; }} defaultValue={commentString} />
+        <input
+          onKeyDown={this.onLinkInputKeyDown}
+          style={inputStyle} type="text"
+          ref={(c) => { this.newCommentText = c; }}
+          defaultValue={commentText} />
         <div className="editor__comment-popup__menu">
           <button onClick={(e) => { this.save(e); }}>Save comment</button>
         </div>
@@ -75,21 +78,20 @@ class CommentPopUp extends React.PureComponent { // eslint-disable-line react/pr
   }
 }
 
-const editorStateSelect = createSelector(
-  (state) => state.get('editor'),
-  (editor) => editor.get('editorState')
-);
-
-const mapStateToProps = (state) => ({
-  editorState: editorStateSelect(state),
-});
+function mapStateToProps(state){
+  return {
+    editorState: state.getIn(['editor','editorState']),
+    commentIsBeingEdited: state.getIn(['editor','commentIsBeingEdited']),
+    commentText: state.getIn(['editor','commentText']),
+  }
+};
 
 function mapDispatchToProps(dispatch) {
   return {
-    setEditorState: (newState) => {
-      console.log('dispatch set state in poup', convertToRaw(newState.getCurrentContent()));
+    saveComment: (newState) => {
+
       dispatch({
-        type: 'SET_EDITOR_STATE',
+        type: 'SAVE_COMMENT',
         editorState: newState,
       });
     },
