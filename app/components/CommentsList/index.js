@@ -1,50 +1,41 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { convertToRaw, Modifier } from 'draft-js';
-
-function CommentSpan(props) {
-  return <span className="editor__comment" style={{ backgroundColor: 'yellow' }}>{props.children}</span>;
-}
+import { convertToRaw } from 'draft-js';
 
 const ListItem = (props) => (
   <li>{props.comment || 'a comment...'}</li>
   );
 
 const style = { background: 'black', border: '1px solid black', minHeight: '100px', color: 'white' };
-const inputStyle = { background: 'white', padding: '2px', color: 'black' };
 class CommentsList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props);
-  }
-
 
   render() {
     const { editorState } = this.props;
 
     const contentState = editorState.getCurrentContent();
     const rawState = convertToRaw(contentState);
-    console.log('rawState', rawState);
 
-    const comments = rawState.blocks.map((comment) => {
-      if (comment.entityRanges.length < 1) { return false; }
-      console.log('commm.', comment.entityRanges[0]);
-      const ent = comment.entityRanges[0].key;
-      console.log('editorState.entityMap', editorState.entityMap);
-      const com = rawState.entityMap[ent].data.comment;
-      console.log('com', com);
-      return { com, ent };
-    });
+    const comments = [].concat(...rawState.blocks.map((block, blockIndex) => {
 
-    /*
-    console.log('this is !', blocks);
-    const blockWithLinkAtBeginning = contentState.getBlockForKey(0);
-    const entityKey = blockWithLinkAtBeginning.getEntityAt(0);
-    const commentInstance = contentState.getEntity(entityKey);
-    const { comment } = commentInstance.getData();
-*/
+      if (block.entityRanges.length < 1) {
+        return [];
+      }
+      console.log("block",block);
+      return block.entityRanges.map((entity) => {
+        const comment = rawState.entityMap[entity.key];
+        return {
+          blockIndex: blockIndex+1,
+          blockKey: block.key,
+          entityKey: entity.key,
+          commentText: comment.data.comment,
+          length: entity.length,
+          offset: entity.offset
+        }
+      });
+    }));
 
     const listItems = comments.map((comment, index) => (
-      <li key={index}>{comment.com}</li>
+      <li key={index}>[{comment.blockIndex}:{comment.offset}] {comment.commentText}</li>
       ));
 
     return (
@@ -52,6 +43,9 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
         <ul>
           {listItems}
         </ul>
+        <p>
+          [Paragrap:Letter Number] Click on comment to edit or remove
+        </p>
       </div>
     );
   }
