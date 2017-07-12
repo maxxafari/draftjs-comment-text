@@ -1,16 +1,16 @@
 {
   "name": "draftjs-comment-text",
   "version": "0.1.0",
-  "description": "Example code for draft-js and redux, the user can add comments to selected text. Comments are listed below text.",
+  "description": "Example code for draft-js and redux, the user can add comments to selected text. Comments are listed below text. based on react.js boilerplate",
   "repository": {
     "type": "git",
-    "url": "git://github.com/react-boilerplate/react-boilerplate.git"
+    "url": "git://github.com/maxxafari/draftjs-comment-text.git"
   },
   "engines": {
     "npm": ">=3",
     "node": ">=5"
   },
-  "author": "Max Stoiber",
+  "author": "Max Berkenstam",
   "license": "MIT",
   "scripts": {
     "analyze:clean": "rimraf stats.json",

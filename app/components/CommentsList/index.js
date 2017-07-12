@@ -52,7 +52,10 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
     }));
 
     const listItems = comments.map((comment, index) => (
-      <li key={index}><button onClick={(e) => {this.selectComment(comment)}}>[{comment.blockIndex}:{comment.offset}] {comment.commentText}</button></li>
+      <li key={index}>
+        [{comment.blockIndex}:{comment.offset}] {comment.commentText}
+        <button onClick={(e) => {this.selectComment(comment)}}>Edit</button>
+      </li>
       ));
 
     return (
@@ -80,6 +83,12 @@ function mapDispatchToProps(dispatch) {
       dispatch({
         type: 'SET_EDITOR_STATE',
         editorState: newState,
+      });
+    },
+    editComment: (commentText) => {
+      dispatch({
+        type: 'EDIT_COMMENT',
+        commentText,
       });
     },
   };

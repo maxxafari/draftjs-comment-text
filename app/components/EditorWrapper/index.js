@@ -74,7 +74,7 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
   render() {
     const buttonSyle = {
       normal: { border: '2px solid black', padding: '10px' },
-      disabled: { border: '2px solid black', padding: '10px', backgroundColor: 'grey' },
+      disabled: { border: '2px solid black', padding: '10px', backgroundColor: 'grey', opacity: '0.3'; },
     };
     const { editorState, setEditorState, commentIsBeingEdited } = this.props;
     const selection = editorState.getSelection();
@@ -83,13 +83,12 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
       <div style={style}>
         <p>Add notes by selecting text</p>
         <div className="editor__menu">
-          <button style={buttonSyle} onClick={(e) => { this.handleMenuClick(e, 'BOLD'); }}>Bold</button>
           <button
             style={textIsSelected ? buttonSyle.normal : buttonSyle.disabled}
             disabled={!textIsSelected}
             onClick={(e) => { this.handleMenuClick(e, 'COMMENT'); }}
           >
-            Add comment
+            Edit comment
           </button>
         </div>
         <Editor handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
