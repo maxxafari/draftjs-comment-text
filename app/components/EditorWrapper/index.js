@@ -74,7 +74,7 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
   render() {
     const buttonSyle = {
       normal: { border: '2px solid black', padding: '10px' },
-      disabled: { border: '2px solid black', padding: '10px', backgroundColor: 'grey', opacity: '0.3'; },
+      disabled: { border: '2px solid black', padding: '10px', opacity: '0.3' },
     };
     const { editorState, setEditorState, commentIsBeingEdited } = this.props;
     const selection = editorState.getSelection();
