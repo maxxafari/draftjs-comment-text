@@ -47,7 +47,6 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
         );
       }
       case 'COMMENT': {
-        console.log('edit comment');
         const selection = editorState.getSelection();
         if (!selection.isCollapsed()) {
           const contentState = editorState.getCurrentContent();
@@ -62,8 +61,6 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
             commentText = linkInstance.getData().comment;
           }
           editComment(commentText);
-        } else {
-          console.log('collapsed');
         }
         break;
       }
@@ -82,7 +79,6 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
     const { editorState, setEditorState, commentIsBeingEdited } = this.props;
     const selection = editorState.getSelection();
     const textIsSelected = !selection.isCollapsed();
-    console.log(commentIsBeingEdited, 'commentIsBeingEdited');
     return (
       <div style={style}>
         <p>Add notes by selecting text</p>

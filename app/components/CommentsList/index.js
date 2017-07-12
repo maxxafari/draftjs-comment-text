@@ -1,13 +1,30 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { convertToRaw } from 'draft-js';
-
-const ListItem = (props) => (
-  <li>{props.comment || 'a comment...'}</li>
-  );
+import { convertToRaw, SelectionState, EditorState } from 'draft-js';
 
 const style = { background: 'black', border: '1px solid black', minHeight: '100px', color: 'white' };
 class CommentsList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+
+  constructor(props){
+    super(props);
+    this.selectComment = this.selectComment.bind(this);
+  }
+
+  selectComment(comment) {
+    const { editorState, setEditorState } = this.props;
+
+    const selectionState = SelectionState.createEmpty(comment.blockKey);
+    const updatedSelection = selectionState.merge({
+      anchorOffset: comment.offset,
+      focusKey: comment.blockKey,
+      focusOffset: (comment.offset + comment.length),
+      hasFocus: false,
+      isBackward: false,
+    });
+    console.log("editorState",editorState.toJS());
+    const newEditorState = EditorState.forceSelection(editorState, updatedSelection);// editorState.set('selection', updatedSelection);
+    setEditorState(newEditorState);
+  }
 
   render() {
     const { editorState } = this.props;
@@ -20,7 +37,7 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
       if (block.entityRanges.length < 1) {
         return [];
       }
-      console.log("block",block);
+
       return block.entityRanges.map((entity) => {
         const comment = rawState.entityMap[entity.key];
         return {
@@ -35,7 +52,7 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
     }));
 
     const listItems = comments.map((comment, index) => (
-      <li key={index}>[{comment.blockIndex}:{comment.offset}] {comment.commentText}</li>
+      <li key={index}><button onClick={(e) => {this.selectComment(comment)}}>[{comment.blockIndex}:{comment.offset}] {comment.commentText}</button></li>
       ));
 
     return (
