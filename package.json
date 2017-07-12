@@ -1,7 +1,7 @@
 {
-  "name": "text-note",
+  "name": "draftjs-comment-text",
   "version": "0.1.0",
-  "description": "Select text and add notes",
+  "description": "Example code for draft-js and redux, the user can add comments to selected text. Comments are listed below text.",
   "repository": {
     "type": "git",
     "url": "git://github.com/react-boilerplate/react-boilerplate.git"
