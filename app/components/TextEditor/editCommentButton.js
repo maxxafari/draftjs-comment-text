@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { style } from 'typestyle';
 import * as csstips from 'csstips';
-import { addOrEditComment } from '../../utils/editorStateHelpers';
+import { addOrEditComment, getCommentTextFromSelection } from '../../utils/editorStateHelpers';
 
 
 const buttonClass = style(
@@ -17,7 +17,6 @@ const editCommentClass = style(
     borderRadius: '5px',
     color: 'white',
     padding: '10px',
-    width: '75px',
     $nest: {
       '&::after': {
         content: '\' \'',
@@ -51,7 +50,7 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
 
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextState.isHovering === true && !nextProps.commentIsBeingEdited) return false;
+    if (nextState.isHovering === true) return false;
     return true;
   }
 
@@ -102,36 +101,19 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
       return false;
     }
 
-    const selection = editorState.getSelection();
-    if (!selection.isCollapsed()) {
-      const contentState = editorState.getCurrentContent();
-      const startKey = editorState.getSelection().getStartKey();
-      const startOffset = editorState.getSelection().getStartOffset();
-      const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
-      const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
-
-      let commentText = '';
-      if (linkKey) { // if there allready is a comment
-        const linkInstance = contentState.getEntity(linkKey);
-        commentText = linkInstance.getData().comment;
+    switch (command) {
+      case 'COMMENT': {
+        const commentText = getCommentTextFromSelection(editorState);
+        editComment(commentText);
+        break;
       }
-
-      switch (command) {
-        case 'COMMENT': {
-          console.log('edit!');
-          editComment(commentText);
-          break;
-        }
-        case 'DELETE': {
-          const newEditorState = addOrEditComment(editorState, null);
-          console.log('editor state:', newEditorState);
-          saveComment(newEditorState);
-          this.render();
-          break;
-        }
-        default: {
-          break;
-        }
+      case 'DELETE': {
+        const newEditorState = addOrEditComment(editorState, null);
+        saveComment(newEditorState);
+        break;
+      }
+      default: {
+        break;
       }
     }
 
@@ -150,6 +132,9 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
   render() {
     this.setToolboxPosition();
     const { position } = this.state;
+    const { editorState } = this.props;
+
+    const hasComment = getCommentTextFromSelection(editorState);
 
     let inlineStyle = {
       opacity: 0,
@@ -175,9 +160,11 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
         <button
           onClick={(e) => { this.handleMenuClick(e, 'COMMENT'); }}
         >📝</button>
-        <button
-          onClick={(e) => { this.handleMenuClick(e, 'DELETE'); }}
-        >❌</button>
+        { hasComment &&
+          <button
+            onClick={(e) => { this.handleMenuClick(e, 'DELETE'); }}
+          >❌</button>
+        }
       </div>
     );
   }

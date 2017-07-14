@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { convertToRaw, SelectionState, EditorState } from 'draft-js';
 import { style } from 'typestyle';
-import * as csstips from 'csstips';
 
 const commentListClass = style(
   {
@@ -17,22 +16,22 @@ const commentListClass = style(
       li: {
         padding: '15px 0',
         borderBottom: '1px solid #eee',
-      }
+      },
 
     },
   }
-)
+);
 const paragraphClass = style({
   fontSize: '14px',
   paddingRight: '5px',
-  display: 'inline-block'
-})
+  display: 'inline-block',
+});
 const editButtonClass = style(
   paragraphClass,
   {
     color: 'rgb(88,128,199)',
   }
-)
+);
 
 class CommentsList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -82,7 +81,7 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
 
     const listItems = comments.map((comment, index) => (
       <li key={index}><span className={paragraphClass}>[{comment.blockIndex}:{comment.offset + 1}]</span>
-         <button className={editButtonClass} onClick={(e) => { this.selectComment(comment); }}>Select in document</button>
+        <button className={editButtonClass} onClick={(e) => { this.selectComment(comment); }}>Select in document</button>
         <br />
         Comment: {comment.commentText}
       </li>

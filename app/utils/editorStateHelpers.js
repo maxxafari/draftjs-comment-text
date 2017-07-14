@@ -30,4 +30,22 @@ const addOrEditComment = (editorState, commentText) => {
   // saveComment(newEditorState);
 };
 
-export { addOrEditComment };
+const getCommentTextFromSelection = (editorState) => {
+  const selection = editorState.getSelection();
+  let commentText = '';
+
+  if (!selection.isCollapsed()) {
+    const contentState = editorState.getCurrentContent();
+    const startKey = editorState.getSelection().getStartKey();
+    const startOffset = editorState.getSelection().getStartOffset();
+    const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
+    const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
+    if (linkKey) { // if there allready is a comment
+      const linkInstance = contentState.getEntity(linkKey);
+      commentText = linkInstance.getData().comment;
+    }
+  }
+  return commentText;
+};
+
+export { addOrEditComment, getCommentTextFromSelection };
