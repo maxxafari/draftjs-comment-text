@@ -1,9 +1,36 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { EditorState, Modifier } from 'draft-js';
+import { style } from 'typestyle';
+import * as csstips from 'csstips';
 
-const style = { background: 'black', border: '1px solid black', minHeight: '100px', color: 'white' };
-const inputStyle = { background: 'white', padding: '2px', color: 'black' };
+const wrapperClass = style(
+  csstips.horizontal,
+  {
+    borderRadius: '3px',
+    overflow: 'hidden',
+    marginBottom: '15px',
+  }
+)
+
+const inputClass = style(
+  csstips.flex,
+  {
+    boxShadow: 'inset 0 0 5px #000000',
+    padding: '10px 15px',
+    widht : '100%'
+  }
+)
+
+const buttonClass = style(
+  csstips.content,
+  {
+    backgroundColor: 'rgb(88,128,199)',
+    color: 'white',
+    padding: '7px 5px',
+    float: 'right'}
+)
+
 class CommentForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
@@ -12,7 +39,9 @@ class CommentForm extends React.PureComponent { // eslint-disable-line react/pre
   }
 
   componentDidMount() {
-    this.newCommentText.focus();
+    if (this.props.commentIsBeingEdited) {
+      this.newCommentText.focus();
+    }
   }
 
   onLinkInputKeyDown(e) {
@@ -56,19 +85,17 @@ class CommentForm extends React.PureComponent { // eslint-disable-line react/pre
   }
 
   render() {
-    const { commentText } = this.props;
+    const { commentText, commentIsBeingEdited } = this.props;
+    if (!commentIsBeingEdited) return null;
     return (
-      <div style={style}>
-        <p>Add comment to text</p>
+      <div className={wrapperClass}>
         <input
           onKeyDown={this.onLinkInputKeyDown}
-          style={inputStyle} type="text"
+          className={inputClass} type="text"
           ref={(c) => { this.newCommentText = c; }}
           defaultValue={commentText}
         />
-        <div className="editor__comment-popup__menu">
-          <button onClick={(e) => { this.save(e); }}>Save comment</button>
-        </div>
+        <button className={buttonClass} onClick={(e) => { this.save(e); }}>Save comment</button>
       </div>
     );
   }

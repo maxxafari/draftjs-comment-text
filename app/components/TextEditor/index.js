@@ -78,8 +78,7 @@ class TextEditor extends React.PureComponent { // eslint-disable-line react/pref
       <div className={textEditorClass}>
         <div ref={(c) => { this.offset = c; }} style={{ position: 'relative' }}>
           <Editor handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
-          { textIsSelected && !commentIsBeingEdited &&
-            <EditCommentButton offsetElement={this.offset} /> }
+          <EditCommentButton offsetElement={this.offset} />
         </div>
       </div>
     );

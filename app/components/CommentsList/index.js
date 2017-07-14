@@ -1,11 +1,42 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { convertToRaw, SelectionState, EditorState } from 'draft-js';
+import { style } from 'typestyle';
+import * as csstips from 'csstips';
 
-const style = { background: 'black', border: '1px solid black', minHeight: '100px', color: 'white' };
+const commentListClass = style(
+  {
+    paddingBottom: '15px',
+    color: 'rgb(69, 71, 82)',
+    $nest: {
+      ul: {
+        listStyle: 'none',
+        padding: 0,
+
+      },
+      li: {
+        padding: '15px 0',
+        borderBottom: '1px solid #eee',
+      }
+
+    },
+  }
+)
+const paragraphClass = style({
+  fontSize: '14px',
+  paddingRight: '5px',
+  display: 'inline-block'
+})
+const editButtonClass = style(
+  paragraphClass,
+  {
+    color: 'rgb(88,128,199)',
+  }
+)
+
 class CommentsList extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.selectComment = this.selectComment.bind(this);
   }
@@ -21,7 +52,6 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
       hasFocus: false,
       isBackward: false,
     });
-    console.log("editorState",editorState.toJS());
     const newEditorState = EditorState.forceSelection(editorState, updatedSelection);// editorState.set('selection', updatedSelection);
     setEditorState(newEditorState);
   }
@@ -33,7 +63,6 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
     const rawState = convertToRaw(contentState);
 
     const comments = [].concat(...rawState.blocks.map((block, blockIndex) => {
-
       if (block.entityRanges.length < 1) {
         return [];
       }
@@ -41,31 +70,30 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
       return block.entityRanges.map((entity) => {
         const comment = rawState.entityMap[entity.key];
         return {
-          blockIndex: blockIndex+1,
+          blockIndex: blockIndex + 1,
           blockKey: block.key,
           entityKey: entity.key,
           commentText: comment.data.comment,
           length: entity.length,
-          offset: entity.offset
-        }
+          offset: entity.offset,
+        };
       });
     }));
 
     const listItems = comments.map((comment, index) => (
-      <li key={index}>
-        [{comment.blockIndex}:{comment.offset}] {comment.commentText}
-        <button onClick={(e) => {this.selectComment(comment)}}>Edit</button>
+      <li key={index}><span className={paragraphClass}>[{comment.blockIndex}:{comment.offset + 1}]</span>
+         <button className={editButtonClass} onClick={(e) => { this.selectComment(comment); }}>Select in document</button>
+        <br />
+        Comment: {comment.commentText}
       </li>
       ));
 
     return (
-      <div style={style}>
+      <div className={commentListClass}>
+        <h3>Comments</h3>
         <ul>
           {listItems}
         </ul>
-        <p>
-          [Paragrap:Letter Number] Click on comment to edit or remove
-        </p>
       </div>
     );
   }

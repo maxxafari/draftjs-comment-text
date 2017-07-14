@@ -33,6 +33,7 @@ const editCommentClass = style(
       left: '0px',
     },
     zIndex: 99,
+    opacity: 0,
   },
   csstips.horizontal,
 );
@@ -40,14 +41,30 @@ const editCommentClass = style(
 class EditCommentButton extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = {position: {}}
+    this.state = { position: {}, isHovering: false };
     this.handleMenuClick = this.handleMenuClick.bind(this);
     this.setToolboxPosition = this.setToolboxPosition.bind(this);
+    this.handleMouseOver = this.handleMouseOver.bind(this);
+    this.handleMouseOut = this.handleMouseOut.bind(this);
   }
 
 
+  handleMouseOver () {
+    // dont close if mouse is on edit button
+    this.setState({ isHovering: true });
+  }
+  handleMouseOut () {
+    this.setState({ isHovering: false });
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if(nextState.isHovering === true && !nextProps.commentIsBeingEdited) return false;
+    return true;
+  }
+
   handleMenuClick(e, command) {
     e.preventDefault();
+    console.log('handle');
     const { editorState, editComment, setEditorState, commentIsBeingEdited } = this.props;
     if (commentIsBeingEdited) {
       console.warn('dont edit text while commenting...');
@@ -73,6 +90,7 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
             const linkInstance = contentState.getEntity(linkKey);
             commentText = linkInstance.getData().comment;
           }
+          console.log('edit!');
           editComment(commentText);
         }
         break;
@@ -111,11 +129,11 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
           const rect = selected.getRangeAt(0).getBoundingClientRect();
           const offset = offsetElement.getBoundingClientRect();
           const newPosition = { left: (rect.left - offset.left), top: (rect.top - offset.top), width: rect.width };
-          if(position.left != newPosition.left || position.top != newPosition.top) {
+          if (position.left != newPosition.left || position.top != newPosition.top) {
             this.setState({ position: newPosition });
           }
         }
-      } catch (e){
+      } catch (e) {
         this.setState({ position: {} });
       }
     }, 100);
@@ -125,17 +143,25 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
   render() {
     this.setToolboxPosition();
     const { position } = this.state;
-    if(!position.left) return null;
-    const { editorState} = this.props;
 
-    const inlineStyle = {
-      left: parseInt(position.left ),
-      top: parseInt(position.top) - 5,
-      transform: 'translate3D(-50%,-100%,0)',
+    let inlineStyle = {
+      opacity: 0,
     };
+    if (position.left) {
+      inlineStyle = {
+        left: parseInt(position.left),
+        top: parseInt(position.top) - 5,
+        transform: 'translate3D(-50%,-100%,0)',
+        opacity: 1,
+      };
+    }
 
     return (
-      <div className={editCommentClass} style={inlineStyle}>
+      <div
+        className={editCommentClass}
+        style={inlineStyle}
+        onMouseOver={this.handleMouseOver}
+        onMouseOut={this.handleMouseOut}>
         <button
           onClick={(e) => { this.handleMenuClick(e, 'COMMENT'); }}
         >📝</button>
