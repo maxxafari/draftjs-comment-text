@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { convertToRaw, SelectionState, EditorState } from 'draft-js';
 import { style } from 'typestyle';
+import CommentForm from '../../components/CommentForm';
 
 const commentListClass = style(
   {
@@ -56,7 +57,7 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   render() {
-    const { editorState } = this.props;
+    const { editorState, commentIsBeingEdited } = this.props;
 
     const contentState = editorState.getCurrentContent();
     const rawState = convertToRaw(contentState);
@@ -81,18 +82,23 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
 
     const listItems = comments.map((comment, index) => (
       <li key={index}><span className={paragraphClass}>[{comment.blockIndex}:{comment.offset + 1}]</span>
-        <button className={editButtonClass} onClick={(e) => { this.selectComment(comment); }}>Select in document</button>
+        <button className={editButtonClass} onClick={() => { this.selectComment(comment); }}>Select in document</button>
         <br />
         Comment: {comment.commentText}
       </li>
       ));
 
     return (
-      <div className={commentListClass}>
-        <h3>Comments</h3>
-        <ul>
-          {listItems}
-        </ul>
+      <div>
+        { commentIsBeingEdited &&
+          <CommentForm />
+        }
+        <div className={commentListClass}>
+          <h3>Comments</h3>
+          <ul>
+            {listItems}
+          </ul>
+        </div>
       </div>
     );
   }
@@ -101,6 +107,7 @@ class CommentsList extends React.PureComponent { // eslint-disable-line react/pr
 function mapStateToProps(state) {
   return {
     editorState: state.getIn(['editor', 'editorState']),
+    commentIsBeingEdited: state.getIn(['editor', 'commentIsBeingEdited']),
   };
 }
 

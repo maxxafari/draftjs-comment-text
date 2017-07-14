@@ -32,7 +32,7 @@ const addOrEditComment = (editorState, commentText) => {
 
 const getCommentTextFromSelection = (editorState) => {
   const selection = editorState.getSelection();
-  let commentText = '';
+  let commentText = null;
 
   if (!selection.isCollapsed()) {
     const contentState = editorState.getCurrentContent();

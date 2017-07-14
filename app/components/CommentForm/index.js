@@ -40,18 +40,12 @@ class CommentForm extends React.PureComponent { // eslint-disable-line react/pre
   }
 
   componentDidMount() {
-    if (this.props.commentIsBeingEdited) {
-      this.newCommentText.focus();
-    }
+    this.newCommentText.focus();
   }
 
   onLinkInputKeyDown(e) {
     switch (e.which) {
-      case 27:
-        console.log('cancel');
-        break;
       case 13:
-        console.log('ok!');
         this.save();
         break;
       default:
@@ -68,7 +62,6 @@ class CommentForm extends React.PureComponent { // eslint-disable-line react/pre
 
   render() {
     const { commentText, commentIsBeingEdited } = this.props;
-    if (!commentIsBeingEdited) return null;
     return (
       <div className={wrapperClass}>
         <input

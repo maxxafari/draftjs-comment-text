@@ -94,10 +94,8 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
 
   handleMenuClick(e, command) {
     e.preventDefault();
-    console.log('handle');
     const { editorState, editComment, saveComment, commentIsBeingEdited } = this.props;
     if (commentIsBeingEdited) {
-      console.warn('dont edit text while commenting...');
       return false;
     }
 
@@ -134,6 +132,10 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
     const { position } = this.state;
     const { editorState } = this.props;
 
+    const selection = editorState.getSelection();
+    if (!selection.size) {
+      return null;
+    }
     const hasComment = getCommentTextFromSelection(editorState);
 
     let inlineStyle = {
