@@ -1,7 +1,8 @@
 import React from 'react';
+import { style } from 'typestyle';
 import TextEditor from '../../components/TextEditor';
 import CommentsList from '../../components/CommentsList';
-import { style } from "typestyle";
+
 
 const wrapperClass = style({
   backgroundColor: '#eee',

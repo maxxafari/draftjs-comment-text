@@ -1,70 +1,33 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Editor, RichUtils } from 'draft-js';
-import CommentsList from '../CommentsList';
 import { style } from 'typestyle';
-import * as csstips from 'csstips';
+import EditCommentButton from './EditCommentButton';
+// import * as csstips from 'csstips';
 require('draft-js/dist/Draft.css');
+
 
 const textEditorClass = style({
   minHeight: '200px',
   color: 'rgb(96,71,82)',
-
+  position: 'relative',
 });
-
-const buttonClass = style(
-  //csstips.content,
-  {padding: '3px'}
-);
-
-const editCommentClass = style(
-  {
-    position: 'relative',
-    backgroundColor: 'rgb(42,42,42)',
-    borderRadius: '5px',
-    color: 'white',
-    padding: '10px',
-    width: '75px',
-    $nest: {
-      '&::after': {
-        content:`' '`,
-        transform: 'rotate(45deg)',
-        position: 'absolute',
-        width: '10px',
-        height: '10px',
-        bottom: '-5px',
-        left: '30px',
-        backgroundColor: 'rgb(42,42,42)',
-      },
-      div: buttonClass,
-    }
-  },
-  csstips.horizontal,
-);
-
-const defaultInternalState = {
-  commentText: '',
-  showCommentPopUp: false,
-};
 
 class TextEditor extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    this.state = defaultInternalState;
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
     this.handleMenuClick = this.handleMenuClick.bind(this);
   }
 
   handleKeyCommand(command) {
-    console.log('handle..');
     const { editorState, setEditorState } = this.props;
+
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
       setEditorState(newState);
-      console.log('handeld', command);
       return 'handled';
     }
-    console.log('not handeld,', command);
     return 'not-handled';
   }
 
@@ -107,25 +70,17 @@ class TextEditor extends React.PureComponent { // eslint-disable-line react/pref
   }
 
   render() {
-    const buttonSyle = {
-      normal: { border: '2px solid black', padding: '10px' },
-      disabled: { border: '2px solid black', padding: '10px', opacity: '0.3' },
-    };
     const { editorState, setEditorState, commentIsBeingEdited } = this.props;
     const selection = editorState.getSelection();
+
     const textIsSelected = !selection.isCollapsed();
     return (
       <div className={textEditorClass}>
-        <div className={editCommentClass}>
-          <button
-            disabled={!textIsSelected}
-            onClick={(e) => { this.handleMenuClick(e, 'COMMENT'); }}
-          >
-            📝
-          </button>
-          <button>❌</button>
+        <div ref={(c) => { this.offset = c; }} style={{ position: 'relative' }}>
+          <Editor handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
+          { textIsSelected && !commentIsBeingEdited &&
+            <EditCommentButton offsetElement={this.offset} /> }
         </div>
-        <Editor handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
       </div>
     );
   }

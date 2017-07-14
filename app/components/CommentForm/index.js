@@ -4,7 +4,7 @@ import { EditorState, Modifier } from 'draft-js';
 
 const style = { background: 'black', border: '1px solid black', minHeight: '100px', color: 'white' };
 const inputStyle = { background: 'white', padding: '2px', color: 'black' };
-class CommentPopUp extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class CommentForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.save = this.save.bind(this);
