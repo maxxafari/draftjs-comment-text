@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { EditorState, Modifier } from 'draft-js';
 import { style } from 'typestyle';
 import * as csstips from 'csstips';
+import { addOrEditComment } from '../../utils/editorStateHelpers';
+
 
 const wrapperClass = style(
   csstips.horizontal,
@@ -11,16 +12,16 @@ const wrapperClass = style(
     overflow: 'hidden',
     marginBottom: '15px',
   }
-)
+);
 
 const inputClass = style(
   csstips.flex,
   {
     boxShadow: 'inset 0 0 5px #000000',
     padding: '10px 15px',
-    widht : '100%'
+    widht: '100%',
   }
-)
+);
 
 const buttonClass = style(
   csstips.content,
@@ -28,8 +29,8 @@ const buttonClass = style(
     backgroundColor: 'rgb(88,128,199)',
     color: 'white',
     padding: '7px 5px',
-    float: 'right'}
-)
+    float: 'right' }
+);
 
 class CommentForm extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -60,26 +61,7 @@ class CommentForm extends React.PureComponent { // eslint-disable-line react/pre
 
   save() {
     const { editorState, saveComment } = this.props;
-    const contentState = editorState.getCurrentContent();
-    const selection = editorState.getSelection();
-    const contentStateWithEntity = contentState.createEntity(
-      'COMMENT',
-      'MUTABLE',
-      { comment: this.newCommentText.value }
-    );
-    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-    console.log('selection state', selection);
-    console.log('entetykey', entityKey);
-    const contentStateWithComment = Modifier.applyEntity(
-      contentStateWithEntity,
-      selection,
-      entityKey
-    );
-    console.log('content state:', contentStateWithComment);
-    const newEditorState = EditorState.push(
-      editorState,
-      contentStateWithComment,
-      'apply-entity');
+    const newEditorState = addOrEditComment(editorState, this.newCommentText.value);
     console.log('editor state:', newEditorState);
     saveComment(newEditorState);
   }

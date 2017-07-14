@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { RichUtils } from 'draft-js';
 import { style } from 'typestyle';
 import * as csstips from 'csstips';
+import { addOrEditComment } from '../../utils/editorStateHelpers';
+
 
 const buttonClass = style(
   csstips.content,
@@ -49,58 +50,11 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
   }
 
 
-  handleMouseOver () {
-    // dont close if mouse is on edit button
-    this.setState({ isHovering: true });
-  }
-  handleMouseOut () {
-    this.setState({ isHovering: false });
-  }
-
   shouldComponentUpdate(nextProps, nextState) {
-    if(nextState.isHovering === true && !nextProps.commentIsBeingEdited) return false;
+    if (nextState.isHovering === true && !nextProps.commentIsBeingEdited) return false;
     return true;
   }
 
-  handleMenuClick(e, command) {
-    e.preventDefault();
-    console.log('handle');
-    const { editorState, editComment, setEditorState, commentIsBeingEdited } = this.props;
-    if (commentIsBeingEdited) {
-      console.warn('dont edit text while commenting...');
-      return false;
-    }
-    switch (command) {
-      case 'BOLD': {
-        return setEditorState(
-          RichUtils.toggleInlineStyle(editorState, 'BOLD')
-        );
-      }
-      case 'COMMENT': {
-        const selection = editorState.getSelection();
-        if (!selection.isCollapsed()) {
-          const contentState = editorState.getCurrentContent();
-          const startKey = editorState.getSelection().getStartKey();
-          const startOffset = editorState.getSelection().getStartOffset();
-          const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
-          const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
-
-          let commentText = '';
-          if (linkKey) { // if there allready is a comment
-            const linkInstance = contentState.getEntity(linkKey);
-            commentText = linkInstance.getData().comment;
-          }
-          console.log('edit!');
-          editComment(commentText);
-        }
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-    return true;
-  }
 
   setToolboxPosition() {
     const { offsetElement } = this.props;
@@ -129,7 +83,7 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
           const rect = selected.getRangeAt(0).getBoundingClientRect();
           const offset = offsetElement.getBoundingClientRect();
           const newPosition = { left: (rect.left - offset.left), top: (rect.top - offset.top), width: rect.width };
-          if (position.left != newPosition.left || position.top != newPosition.top) {
+          if (position.left !== newPosition.left || position.top !== newPosition.top) {
             this.setState({ position: newPosition });
           }
         }
@@ -139,6 +93,59 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
     }, 100);
   }
 
+  handleMenuClick(e, command) {
+    e.preventDefault();
+    console.log('handle');
+    const { editorState, editComment, saveComment, commentIsBeingEdited } = this.props;
+    if (commentIsBeingEdited) {
+      console.warn('dont edit text while commenting...');
+      return false;
+    }
+
+    const selection = editorState.getSelection();
+    if (!selection.isCollapsed()) {
+      const contentState = editorState.getCurrentContent();
+      const startKey = editorState.getSelection().getStartKey();
+      const startOffset = editorState.getSelection().getStartOffset();
+      const blockWithLinkAtBeginning = contentState.getBlockForKey(startKey);
+      const linkKey = blockWithLinkAtBeginning.getEntityAt(startOffset);
+
+      let commentText = '';
+      if (linkKey) { // if there allready is a comment
+        const linkInstance = contentState.getEntity(linkKey);
+        commentText = linkInstance.getData().comment;
+      }
+
+      switch (command) {
+        case 'COMMENT': {
+          console.log('edit!');
+          editComment(commentText);
+          break;
+        }
+        case 'DELETE': {
+          const newEditorState = addOrEditComment(editorState, null);
+          console.log('editor state:', newEditorState);
+          saveComment(newEditorState);
+          this.render();
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  handleMouseOut() {
+    this.setState({ isHovering: false });
+  }
+
+  handleMouseOver() {
+    // dont close if mouse is on edit button
+    this.setState({ isHovering: true });
+  }
 
   render() {
     this.setToolboxPosition();
@@ -149,8 +156,8 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
     };
     if (position.left) {
       inlineStyle = {
-        left: parseInt(position.left),
-        top: parseInt(position.top) - 5,
+        left: parseInt(position.left, 0),
+        top: parseInt(position.top, 0) - 5,
         transform: 'translate3D(-50%,-100%,0)',
         opacity: 1,
       };
@@ -161,11 +168,16 @@ class EditCommentButton extends React.PureComponent { // eslint-disable-line rea
         className={editCommentClass}
         style={inlineStyle}
         onMouseOver={this.handleMouseOver}
-        onMouseOut={this.handleMouseOut}>
+        onFocus={this.handleMouseOver}
+        onMouseOut={this.handleMouseOut}
+        onBlur={this.handleMouseOut}
+      >
         <button
           onClick={(e) => { this.handleMenuClick(e, 'COMMENT'); }}
         >📝</button>
-        <button>❌</button>
+        <button
+          onClick={(e) => { this.handleMenuClick(e, 'DELETE'); }}
+        >❌</button>
       </div>
     );
   }
@@ -181,16 +193,16 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    setEditorState: (newState) => {
-      dispatch({
-        type: 'SET_EDITOR_STATE',
-        editorState: newState,
-      });
-    },
     editComment: (commentText) => {
       dispatch({
         type: 'EDIT_COMMENT',
         commentText,
+      });
+    },
+    saveComment: (newState) => {
+      dispatch({
+        type: 'SAVE_COMMENT',
+        editorState: newState,
       });
     },
   };
