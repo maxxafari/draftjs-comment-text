@@ -1,18 +1,53 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Editor, RichUtils } from 'draft-js';
-import CommentPopUp from './CommentPopUp';
 import CommentsList from '../CommentsList';
+import { style } from 'typestyle';
+import * as csstips from 'csstips';
 require('draft-js/dist/Draft.css');
 
-const style = { background: 'white', border: '1px solid black', minHeight: '200px' };
+const textEditorClass = style({
+  minHeight: '200px',
+  color: 'rgb(96,71,82)',
+
+});
+
+const buttonClass = style(
+  //csstips.content,
+  {padding: '3px'}
+);
+
+const editCommentClass = style(
+  {
+    position: 'relative',
+    backgroundColor: 'rgb(42,42,42)',
+    borderRadius: '5px',
+    color: 'white',
+    padding: '10px',
+    width: '75px',
+    $nest: {
+      '&::after': {
+        content:`' '`,
+        transform: 'rotate(45deg)',
+        position: 'absolute',
+        width: '10px',
+        height: '10px',
+        bottom: '-5px',
+        left: '30px',
+        backgroundColor: 'rgb(42,42,42)',
+      },
+      div: buttonClass,
+    }
+  },
+  csstips.horizontal,
+);
 
 const defaultInternalState = {
   commentText: '',
   showCommentPopUp: false,
 };
 
-class EditorWrapper extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+class TextEditor extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.state = defaultInternalState;
@@ -80,22 +115,17 @@ class EditorWrapper extends React.PureComponent { // eslint-disable-line react/p
     const selection = editorState.getSelection();
     const textIsSelected = !selection.isCollapsed();
     return (
-      <div style={style}>
-        <p>Add notes by selecting text</p>
-        <div className="editor__menu">
+      <div className={textEditorClass}>
+        <div className={editCommentClass}>
           <button
-            style={textIsSelected ? buttonSyle.normal : buttonSyle.disabled}
             disabled={!textIsSelected}
             onClick={(e) => { this.handleMenuClick(e, 'COMMENT'); }}
           >
-            Edit comment
+            📝
           </button>
+          <button>❌</button>
         </div>
         <Editor handleKeyCommand={this.handleKeyCommand} editorState={editorState} onChange={setEditorState} />
-        {commentIsBeingEdited &&
-          <CommentPopUp />
-        }
-        <CommentsList />
       </div>
     );
   }
@@ -126,4 +156,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditorWrapper);
+export default connect(mapStateToProps, mapDispatchToProps)(TextEditor);

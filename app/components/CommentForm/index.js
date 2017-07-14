@@ -93,4 +93,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CommentPopUp);
+export default connect(mapStateToProps, mapDispatchToProps)(CommentForm);

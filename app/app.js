@@ -32,8 +32,10 @@ import 'file-loader?name=[name].[ext]!./.htaccess';
 
 import configureStore from './store';
 
-// Import CSS reset and Global Styles
-import './global-styles';
+// CSSTIPS  from typestyle
+import {setupPage, normalize} from "csstips";
+normalize();
+setupPage('#app'); //body & box-sizing
 
 // Import root routes
 import createRoutes from './routes';

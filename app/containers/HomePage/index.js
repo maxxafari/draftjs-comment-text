@@ -1,23 +1,26 @@
 import React from 'react';
-import EditorWrapper from '../../components/EditorWrapper';
+import TextEditor from '../../components/TextEditor';
+import CommentsList from '../../components/CommentsList';
 import { style } from "typestyle";
 
 const wrapperClass = style({
   backgroundColor: '#eee',
   padding: '15px',
+  fontFamily: 'Arial, Helvetica, sans-serif',
 
 });
 
 const blockClass = style({
-  padding: '30px 15px',
+  padding: '30px',
   backgroundColor: '#fff',
   marginBottom: '15px',
-  boxShadow: '-2px 2px 3px 0px rgba(0,0,0,0.51)'
+  boxShadow: '-2px 2px 3px 0px rgba(0,0,0,0.51)',
+  borderRadius: '3px',
 });
 
 const titleClass = style({
   textAlign: 'center',
-  fontSize: '5em'
+  fontSize: '3em',
 });
 
 export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -26,7 +29,10 @@ export default class HomePage extends React.PureComponent { // eslint-disable-li
       <div className={wrapperClass}>
         <div className={blockClass}>
           <h1 className={titleClass}>Offer terms</h1>
-          <EditorWrapper />
+          <TextEditor />
+        </div>
+        <div className={blockClass}>
+          <CommentsList />
         </div>
       </div>
     );
